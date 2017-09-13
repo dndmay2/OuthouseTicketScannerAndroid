@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.amayzingapps.outhouseticketscannerandroid.EventDetailsActivity"
+        tools:layout_editor_absoluteY="81dp"
+        tools:layout_editor_absoluteX="0dp"
+        android:background="@android:color/background_light">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="eventName"
+            android:ems="10"
+            android:id="@+id/eventName"
+            android:textAlignment="center"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/scanButton"
+            app:layout_constraintLeft_toLeftOf="@+id/scanButton"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="18sp"
+            android:textColor="@color/colorRed"/>
+
+    <Button
+            android:text="Scan Ticket"
+            android:layout_width="161dp"
+            android:layout_height="122dp"
+            android:id="@+id/scanButton"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:layout_constraintLeft_creator="1"
+            android:layout_marginBottom="28dp"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="Total Tickets:"
+            android:ems="10"
+            android:id="@+id/totalTicketsPrompt"
+            android:textSize="14sp"
+            android:textColor="@color/colorBlack"
+            app:layout_constraintTop_toTopOf="@+id/totalTickets"
+            app:layout_constraintRight_toLeftOf="@+id/totalTickets"
+            tools:layout_constraintRight_creator="1"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:editable="false"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="Tickets Scanned:"
+            android:ems="10"
+            android:id="@+id/ticketScannedPrompt"
+            android:textSize="14sp"
+            app:layout_constraintLeft_toLeftOf="@+id/totalTicketsPrompt"
+            android:textColor="@color/colorBlack"
+            app:layout_constraintTop_toTopOf="@+id/ticketsScanned"/>
+
+    <TextView
+            android:layout_width="76dp"
+            android:layout_height="36dp"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/ticketsScanned"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp"
+            android:textAlignment="textEnd"
+            android:text="0"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toTopOf="@+id/totalTickets"
+            android:layout_marginEnd="69dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginBottom="1dp"
+            android:layout_marginRight="69dp"/>
+
+    <TextView
+            android:layout_width="76dp"
+            android:layout_height="36dp"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/totalTickets"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp"
+            android:textAlignment="textEnd"
+            android:text="0"
+            app:layout_constraintRight_toRightOf="@+id/ticketsScanned"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toTopOf="@+id/scanButton"
+            android:layout_marginBottom="2dp"/>
+
+    <TextView
+            android:text="Press Scan Ticket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/msgText"
+            android:textSize="24sp"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="113dp"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>
