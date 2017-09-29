@@ -1,5 +1,8 @@
 package com.amayzingapps.outhouseticketscannerandroid.Data;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
+import android.databinding.ObservableField;
 import android.os.AsyncTask;
 import android.util.Log;
 import org.ksoap2.SoapEnvelope;
@@ -12,6 +15,8 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
+
 import static com.amayzingapps.outhouseticketscannerandroid.Data.Password.OUTHOUSE_ADMIN;
 import static com.amayzingapps.outhouseticketscannerandroid.Data.Password.OUTHOUSE_PASSWORD;
 
@@ -19,18 +24,24 @@ import static com.amayzingapps.outhouseticketscannerandroid.Data.Password.OUTHOU
  * Created by derekmay on 6/28/17.
  */
 
-public class DataService {
+public class DataService extends ViewModel {
     public static final String TEST_EVENT_ID = "8532";
     public static final String TEST_VENUE_ID = "191";
     //private static String TEST_TICKET_CODE = "06L0575520";
     //private static String TEST_TICKET_CODE = "06L0213152";
     public static String TEST_TICKET_CODE = "06L0660550";
     public static boolean LED_BACK_LIGHT_SETTING = false;
+    public MutableLiveData <String> TicketCountLive = new MutableLiveData<>();
+    public MutableLiveData <String> ScannedTicketCountLive = new MutableLiveData<>();
+    public MutableLiveData <String> VenueEventsLive = new MutableLiveData<>();
+    public MutableLiveData <String> UpcomingEventsWithDateLive = new MutableLiveData<>();
+    public MutableLiveData <String> TicketCodeLive = new MutableLiveData<>();
+    public MutableLiveData <String> TicketMessageLive = new MutableLiveData<>();
 
 
     public static String NUM_TICKETS = "0";
     public static String NUM_SCANNED_TICKETS = "0";
-    public static String TICKET_CODE = "Press Scan Ticket";
+    public final ObservableField<String> TICKET_CODE = new ObservableField<>();
     public static String TICKET_STATUS = "None";
     public static String TICKET_STATUS_MESSAGE = "";
     public static final ArrayList<UpcomingEvent> UPCOMING_EVENTS_FOR_VENUE = new ArrayList<>();
@@ -43,67 +54,136 @@ public class DataService {
     private static Map EventListMap = new HashMap();
 
     {
-        Log.d("DataService", "DataService class is being executed");
+        Log.v("OHDataService", "DataService class is being executed");
     }
 
-    public static class CallWebService extends AsyncTask<String, Void, String> {
-        ResultsListener listener;
+    public DataService() {
+        super();
+    }
+
+    public void getTicketCountForEvent_Live(String eventId){
+        String cmd = "GetTicketCountForEvent";
+        DataService.CallWebService task = new DataService.CallWebService();
+        task.execute(cmd, eventId);
+    }
+
+    public MutableLiveData<String> getTicketCountLive() {
+        return TicketCountLive;
+    }
+
+    public void getScannedTicketCountForEvent_Live(String eventId){
+        String cmd = "GetScannedTicketCountForEvent";
+        DataService.CallWebService task = new DataService.CallWebService();
+        task.execute(cmd, eventId);
+    }
+
+    public MutableLiveData<String> getScannedTicketCountLive() {
+        return ScannedTicketCountLive;
+    }
+
+    public void getUpcomingEventsForVenue_live(String venueId){
+        String cmd = "GetUpcommingEvents_Custom";
+        DataService.CallWebService task = new DataService.CallWebService();
+        task.execute(cmd, venueId);
+    }
+
+    public MutableLiveData<String> getVenueEventsLive() {
+        if(VenueEventsLive == null){
+            VenueEventsLive.postValue("null");
+        }
+        return VenueEventsLive;
+    }
+
+    public void getUpcomingEventsWithDate_live(){
+        String cmd = "GetUpcommingEvents";
+        DataService.CallWebService task = new DataService.CallWebService();
+        task.execute(cmd);
+    }
+
+    public MutableLiveData<String> getUpcomingEventsWithDateLive() {
+        Log.d("OHLiveData", "i made it");
+        if(UpcomingEventsWithDateLive == null){
+            UpcomingEventsWithDateLive.postValue("null");
+        }
+        return UpcomingEventsWithDateLive;
+    }
+
+    public void setTicketCodeLive(String ticketCode) {
+        Log.d("OHsetTicketCodeLive", "setting the ticketCodeLive variable = " + ticketCode);
+        TicketCodeLive.setValue(ticketCode);
+    }
+
+    public MutableLiveData<String> getTicketCodeLive() {
+        return TicketCodeLive;
+    }
+
+    public void processTicketCode_Live(String eventId, String ticketCode) {
+        String cmd = "ProcessTicketCode";
+        DataService.CallWebService task = new DataService.CallWebService();
+        task.execute(cmd, eventId, ticketCode);
+    }
+
+    public MutableLiveData<String> getTicketMessageLive() {
+        return TicketMessageLive;
+    }
+
+    private class CallWebService extends AsyncTask<String, Void, String> {
         private SoapObject soapObject;
         private SoapObject soapObjectResult;
         private SoapPrimitive soapPrimitiveResult;
+        private Vector<SoapPrimitive> soapVectorPrimitiveResult;
         private String currentCommand;
         private ArrayList<String> properties = new ArrayList<>();
 
-        public void setOnResultsListener(ResultsListener listener) {
-            this.listener = listener;
-        }
-
         @Override
         protected void onPostExecute(String s) {
-            Log.v("DataService", "onPostExecute:" + s + ", " + this.currentCommand);
-            if(this.properties.size() > 0) {
-                // We have a hierarchical soap object
-                for(int i = 0; i < this.properties.size(); i+=2) {
-                    String [] eventIdList = this.properties.get(i).split("::");
-                    String [] eventNameList = this.properties.get(i+1).split("::");
-                    String eventId = eventIdList[1];
-                    String eventName = eventNameList[1];
-                    String [] eventNamePartsList = eventName.split(" - ");
-                    String eventDate = "no date";
-                    switch (this.currentCommand) {
-                        case "GetUpcommingEvents_Custom":
+            Log.v("OHDataService", "onPostExecute:" + s + ", " + this.currentCommand);
+            switch (this.currentCommand) {
+                case "GetTicketCountForEvent":
+                    NUM_TICKETS = this.soapPrimitiveResult.toString();
+                    TicketCountLive.setValue(NUM_TICKETS);
+                    break;
+                case "GetScannedTicketCountForEvent":
+                    NUM_SCANNED_TICKETS = this.soapPrimitiveResult.toString();
+                    ScannedTicketCountLive.setValue(NUM_SCANNED_TICKETS);
+                    break;
+                case "ProcessTicketCode":
+                    String result = this.soapVectorPrimitiveResult.get(0).toString();
+                    String message = this.soapVectorPrimitiveResult.get(1).toString();
+                    Log.d("OHDataService", "testing processTicketCode " + result + " " + message);
+                    TicketMessageLive.postValue(message);
+                    break;
+                case "GetUpcommingEvents_Custom":
+                case "GetUpcommingEvents":
+                    // We have a hierarchical soap object
+                    for(int i = 0; i < this.properties.size(); i+=2) {
+                        String [] eventIdList = this.properties.get(i).split("::");
+                        String [] eventNameList = this.properties.get(i+1).split("::");
+                        String eventId = eventIdList[1];
+                        String eventName = eventNameList[1];
+                        String [] eventNamePartsList = eventName.split(" - ");
+                        String eventDate;
+                        if(this.currentCommand.equals("GetUpcommingEvents_Custom")) {
                             UpcomingEvent event = new UpcomingEvent(eventId, eventName, UPCOMING_EVENTS_WITH_DATE.get(eventId));
                             UPCOMING_EVENTS_FOR_VENUE.add(event);
                             EVENTS_MAP.put(eventId, event);
-                            Log.v("DataService", "prop:" + event.eventId + "," + event.eventName + "," + event.eventDate);
-                            break;
-                        case "GetUpcommingEvents":
-                            if(eventNamePartsList.length >= 2) {
+                            Log.d("OHDataService", "prop:" + event.eventId + "," + event.eventName + "," + event.eventDate);
+                        }
+                        else {
+                            if (eventNamePartsList.length >= 2) {
                                 eventDate = eventNamePartsList[eventNamePartsList.length - 1];
                                 UPCOMING_EVENTS_WITH_DATE.put(eventId, eventDate);
                             }
-                            break;
-                        default:
-                            break;
+                        }
                     }
-                }
-            }
-            else {
-                switch (this.currentCommand) {
-                    case "GetTicketCountForEvent":
-                        NUM_TICKETS = this.soapPrimitiveResult.toString();
-                        break;
-                    case "GetScannedTicketCountForEvent":
-                        NUM_SCANNED_TICKETS = this.soapPrimitiveResult.toString();
-                        break;
-                    default:
-                        break;
-                }
-
-            }
-            if(this.currentCommand != "GetUpcommingEvents") {
-                Log.v("DataService", "Done");
-                listener.onResultsSucceeded("second call");
+                    if(this.currentCommand.equals("GetUpcommingEvents_Custom")) {
+                        VenueEventsLive.setValue("Done");
+                    }
+                    else {
+                        UpcomingEventsWithDateLive.setValue("Done");
+                    }
+                default:
+                    break;
             }
         }
 
@@ -112,6 +192,7 @@ public class DataService {
             //params[1] == venueId
             String commandName = params[0];
             String soapAction = NAMESPACE + commandName;
+            Log.d("OHDataService", "doInBackground: " + commandName);
 
             SoapObject soapObject = new SoapObject(NAMESPACE, commandName);
 
@@ -125,15 +206,15 @@ public class DataService {
                     addSoapProperty("VenueID", params[1]);
                     break;
                 case "GetTicketCountForEvent":
-                    Log.v("DataService", "BG - GetTicketCountForEvent" );
+                    Log.d("OHDataService", "BG - GetTicketCountForEvent" );
                     addSoapProperty("EventID", params[1]);
                     break;
                 case "GetScannedTicketCountForEvent":
-                    Log.v("DataService", "BG - GetScannedTicketCountForEvent" );
+                    Log.d("OHDataService", "BG - GetScannedTicketCountForEvent" );
                     addSoapProperty("EventID", params[1]);
                     break;
                 case "ProcessTicketCode":
-                    Log.v("DataService", "BG - ProcessTicketCode" );
+                    Log.d("OHDataService", "BG - ProcessTicketCode" );
                     addSoapProperty("EventID", params[1]);
                     addSoapProperty("TicketCode", params[2]);
                     break;
@@ -149,14 +230,26 @@ public class DataService {
 
             try {
                 httpTransportSE.call(soapAction, envelope);
-                if(commandName == "GetUpcommingEvents" || commandName == "GetUpcommingEvents_Custom" || commandName == "GetTicketDBForEvent") {
-                    this.soapObjectResult = (SoapObject)envelope.getResponse();
-                    ScanSoapObject(this.soapObjectResult);
+                switch (commandName) {
+                    case "GetUpcommingEvents":
+                    case "GetUpcommingEvents_Custom":
+                    case "GetTicketDBForEvent": {
+                        this.soapObjectResult = (SoapObject)envelope.getResponse();
+                        ScanSoapObject(this.soapObjectResult);
+                        break;
+                    }
+                    case "ProcessTicketCode": {
+                        this.soapVectorPrimitiveResult = (Vector<SoapPrimitive>) envelope.getResponse();
+                        break;
+                    }
+                    default: {
+                        this.soapPrimitiveResult = (SoapPrimitive) envelope.getResponse();
+                        break;
+                    }
+
                 }
-                else {
-                    this.soapPrimitiveResult = (SoapPrimitive) envelope.getResponse();
-                }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -193,7 +286,6 @@ public class DataService {
                 }
             }
         }
-
 
     }
 

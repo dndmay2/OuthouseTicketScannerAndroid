@@ -1,10 +1,13 @@
 package com.amayzingapps.outhouseticketscannerandroid;
 
-import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +18,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.amayzingapps.outhouseticketscannerandroid.Data.DataService;
-import com.amayzingapps.outhouseticketscannerandroid.Data.ResultsListener;
 import com.amayzingapps.outhouseticketscannerandroid.Data.UpcomingEvent;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
  * listActivity would not show the title bar.
  */
 
-public class EventListActivity extends AppCompatActivity implements ResultsListener {
+public class EventListActivity extends AppCompatActivity  {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -43,11 +45,30 @@ public class EventListActivity extends AppCompatActivity implements ResultsListe
 
         final Context context = this;
 
-        getUpcomingEventsWithDate();
-        getUpcomingEventsForVenue(DataService.TEST_VENUE_ID);
+//        DataService md = new DataService();
+//        ActivityEvenListBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_event_list);
+//        binding.setDataService(md);
 
-        eventListView = (ListView) findViewById(R.id.event_list);
-        setupListView(eventListView);
+        eventListView = findViewById(R.id.event_list);
+
+        final DataService model = ViewModelProviders.of(this).get(DataService.class);
+        model.getUpcomingEventsWithDate_live();
+        model.getUpcomingEventsWithDateLive().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String data) {
+                Log.d("OHEventListActivity", "upcoming events: " + data);
+                model.getUpcomingEventsForVenue_live(DataService.TEST_VENUE_ID);
+            }
+        });
+
+        model.getVenueEventsLive().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String data) {
+                Log.d("OHEventListActivity", "venue events: " + data);
+                setupListView(eventListView);
+            }
+        });
+
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -63,13 +84,13 @@ public class EventListActivity extends AppCompatActivity implements ResultsListe
         });
     }
 
-    public void onResultsSucceeded(String result) {
-        Log.d("onResultsSucceeded", "I made it " + result);
-        Log.v("DataService", "I made it to the listener on activity");
-        eventListView = (ListView) findViewById(R.id.event_list);
-        setupListView(eventListView);
-
-    }
+//    public void onResultsSucceeded(String result) {
+//        Log.d("OHonResultsSucceeded", "I made it " + result);
+//        Log.d("OHDataService", "I made it to the listener on activity");
+//        eventListView = findViewById(R.id.event_list);
+//        setupListView(eventListView);
+//
+//    }
 
     private void setupListView(@NonNull ListView eventListView) {
 //        ArrayList<UpcomingEvent> mValues = new ArrayList<>();
@@ -77,6 +98,8 @@ public class EventListActivity extends AppCompatActivity implements ResultsListe
 //        EventListViewAdapter adapter = new EventListViewAdapter(this, mValues);
         EventListViewAdapter adapter = new EventListViewAdapter(this, DataService.UPCOMING_EVENTS_FOR_VENUE);
         eventListView.setAdapter(adapter);
+//        eventListView.setBackgroundColor(Color.BLACK);
+        Log.d("OHsetupListView", "Done");
     }
 
 
@@ -85,7 +108,7 @@ public class EventListActivity extends AppCompatActivity implements ResultsListe
         private final LayoutInflater mInflater;
         private final Context mContext;
 
-        public EventListViewAdapter(Context context, ArrayList<UpcomingEvent> items) {
+        EventListViewAdapter(Context context, ArrayList<UpcomingEvent> items) {
             mValues = items;
             mContext = context;
             mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -132,39 +155,39 @@ public class EventListActivity extends AppCompatActivity implements ResultsListe
             return convertView;
         }
 
-        public class ViewHolder {
-            public TextView eventNameView;
-            public TextView eventDateView;
+        class ViewHolder {
+            TextView eventNameView;
+            TextView eventDateView;
         }
 
     }
 
-    public void getUpcomingEventsForVenue(String venueId){
-        String cmd = "GetUpcommingEvents_Custom";
-        DataService.CallWebService task = new DataService.CallWebService();
-        /*
-         * Set this Activity as the listener
-         * on the AsyncTask. The AsyncTask will now
-         * have a reference to this Activity and will
-         * call onResultsSucceeded() in its
-         * onPostExecute method.
-         */
-        task.setOnResultsListener(this);
-        task.execute(cmd, venueId);
-    }
-
-    public void getUpcomingEventsWithDate(){
-        String cmd = "GetUpcommingEvents";
-        DataService.CallWebService task = new DataService.CallWebService();
-        /*
-         * Set this Activity as the listener
-         * on the AsyncTask. The AsyncTask will now
-         * have a reference to this Activity and will
-         * call onResultsSucceeded() in its
-         * onPostExecute method.
-         */
-        task.setOnResultsListener(this);
-        task.execute(cmd);
-    }
+//    public void getUpcomingEventsForVenue(String venueId){
+//        String cmd = "GetUpcommingEvents_Custom";
+//        DataService.CallWebService task = new DataService.CallWebService();
+//        /*
+//         * Set this Activity as the listener
+//         * on the AsyncTask. The AsyncTask will now
+//         * have a reference to this Activity and will
+//         * call onResultsSucceeded() in its
+//         * onPostExecute method.
+//         */
+//        task.setOnResultsListener(this);
+//        task.execute(cmd, venueId);
+//    }
+//
+//    public void getUpcomingEventsWithDate(){
+//        String cmd = "GetUpcommingEvents";
+//        DataService.CallWebService task = new DataService.CallWebService();
+//        /*
+//         * Set this Activity as the listener
+//         * on the AsyncTask. The AsyncTask will now
+//         * have a reference to this Activity and will
+//         * call onResultsSucceeded() in its
+//         * onPostExecute method.
+//         */
+//        task.setOnResultsListener(this);
+//        task.execute(cmd);
+//    }
 
 }

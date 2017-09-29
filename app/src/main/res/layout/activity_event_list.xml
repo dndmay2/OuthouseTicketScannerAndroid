@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/event_list"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          tools:context="com.amayzingapps.outhouseticketscannerandroid.EventListActivity"
-          tools:listitem="@layout/event_list_content"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_height="fill_parent"
+              android:layout_width="fill_parent"
+              android:orientation="vertical"
+              android:background="@color/colorBlack"
+              >
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/event_list"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@color/colorBlack"
+              tools:context="com.amayzingapps.outhouseticketscannerandroid.EventListActivity"
+              tools:listitem="@layout/event_list_content"/>
+
+</LinearLayout>
