@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:title="Venue ID"
+                        android:editable="true"
+                        android:key="venueId"
+                        android:visibility="visible"/>
+    <CheckBoxPreference android:title="Enable Sound Effects"
+                        android:defaultValue="true"
+                        android:key="soundEffects" />
+</PreferenceScreen>

@@ -1,8 +1,12 @@
 package com.amayzingapps.outhouseticketscannerandroid;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -26,7 +30,7 @@ public class ScanActivity extends AppCompatActivity {
         integrator.setDesiredBarcodeFormats(barcodeFormats);
         integrator.setPrompt("Scan a barcode");
         integrator.setCameraId(0);  // Use a specific camera of the device
-        integrator.setBeepEnabled(true);
+        integrator.setBeepEnabled(false);
         integrator.setBarcodeImageEnabled(true);
         integrator.setOrientationLocked(false);
         integrator.initiateScan();
@@ -41,14 +45,15 @@ public class ScanActivity extends AppCompatActivity {
         String ticketCode;
         if(scanningResult != null) {
             if(scanningResult.getContents() == null) {
-                ticketCode = "Press Scan Ticket";
-                toast = Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG);
+                ticketCode = "Cancelled";
+                toast = Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             } else {
                 ticketCode = scanningResult.getContents();
-                toast = Toast.makeText(this, "Scanned: " + ticketCode, Toast.LENGTH_LONG);
+//                toast = Toast.makeText(this, "Scanned: " + ticketCode, Toast.LENGTH_SHORT);
+                shakeItBaby();
             }
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
         } else {
             ticketCode = null;
             super.onActivityResult(requestCode, resultCode, intent);
@@ -56,6 +61,15 @@ public class ScanActivity extends AppCompatActivity {
         returnIntent.putExtra("TICKET_CODE", ticketCode);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
+    }
+
+    // Vibrate for 150 milliseconds
+    private void shakeItBaby() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+        }
     }
 }
 

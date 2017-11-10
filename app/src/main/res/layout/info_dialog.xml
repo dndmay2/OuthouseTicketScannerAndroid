@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+        android:orientation="vertical">
+    <TextView
+            android:id="@+id/dialog_eventName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="event name"
+            android:layout_gravity="center"
+            />
+    <TextView
+            android:id="@+id/dialog_venueId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="venue id"
+            android:layout_gravity="center"
+            />
+    <TextView
+            android:id="@+id/dialog_eventId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="event id"
+            android:layout_gravity="center"
+            />
+    <TextView
+            android:id="@+id/dialog_webPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="http://www.outhousetickets.com"
+            android:layout_gravity="center"
+            />
+    <Button
+            android:id="@+id/closeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Close"/>
+    <Button
+            android:id="@+id/visitWebPageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Visit Web Page"/>
+
+</LinearLayout>

@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="?android:attr/listPreferredItemHeightLarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:background="@drawable/selector_row"
                 android:padding="6dip" >
 
     <TextView
-            android:id="@+id/event_date_tv"
-            android:layout_width="fill_parent"
-            android:layout_height="24dip"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:maxLines="1"
+            android:id="@+id/event_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textSize="28sp"
             android:textAppearance="?attr/textAppearanceListItem"/>
     <TextView
-            android:id="@+id/event_name_tv"
-            android:layout_width="fill_parent"
+            android:id="@+id/event_date_tv"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/event_date_tv"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignWithParentIfMissing="true"
-            android:gravity="center_vertical"
-            android:textSize="28dp"
-            android:fontFamily="font/Noteworthy-Bold"
+            android:layout_below="@+id/event_name_tv"
+            android:gravity="bottom"
             android:textAppearance="?attr/textAppearanceListItem"/>
 
 </RelativeLayout>

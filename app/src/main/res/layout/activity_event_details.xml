@@ -95,6 +95,42 @@
             app:layout_constraintBottom_toTopOf="@+id/scanButton"
             android:layout_marginBottom="2dp"/>
 
+    <ImageView
+            android:layout_width="228dp"
+            android:layout_height="0dp"
+            app:srcCompat="@mipmap/stopsign"
+            android:id="@+id/stopSignImg"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="@+id/checkMarkImg"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="10dp"
+            tools:layout_constraintLeft_creator="1"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/checkMarkImg"/>
+
+    <ImageView
+            android:layout_width="208dp"
+            android:layout_height="0dp"
+            app:srcCompat="@mipmap/checkmark"
+            android:id="@+id/checkMarkImg"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="@+id/eventName"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="41dp"
+            tools:layout_constraintLeft_creator="1"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
             android:text="Press Scan Ticket"
             android:layout_width="wrap_content"
@@ -102,12 +138,11 @@
             android:id="@+id/msgText"
             android:textSize="24sp"
             tools:layout_constraintTop_creator="1"
-            tools:layout_constraintRight_creator="1"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="113dp"
-            tools:layout_constraintLeft_creator="1"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            tools:layout_constraintBottom_creator="1"
+            app:layout_constraintBottom_toBottomOf="@+id/checkMarkImg"
+            app:layout_constraintTop_toTopOf="@+id/checkMarkImg"
+            app:layout_constraintRight_toLeftOf="@+id/checkMarkImg"
+            app:layout_constraintLeft_toRightOf="@+id/checkMarkImg"/>
 
     <TextView
             android:layout_width="wrap_content"
@@ -117,7 +152,7 @@
             tools:layout_constraintTop_creator="1"
             tools:layout_constraintRight_creator="1"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="41dp"
+            android:layout_marginTop="24dp"
             tools:layout_constraintLeft_creator="1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"

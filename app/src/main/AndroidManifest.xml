@@ -4,6 +4,7 @@
           package="com.amayzingapps.outhouseticketscannerandroid">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
             android:allowBackup="true"
             android:icon="@mipmap/outhouse_launcher"
@@ -33,7 +34,11 @@
         <activity
                 android:name="com.journeyapps.barcodescanner.CaptureActivity"
                 android:screenOrientation="fullSensor"
-                tools:replace="screenOrientation" />
+                tools:replace="screenOrientation"/>
+        <activity
+                android:name=".MyPreferenceActivity"
+                android:theme="@style/PreferencesTheme">
+        </activity>
     </application>
 
 </manifest>

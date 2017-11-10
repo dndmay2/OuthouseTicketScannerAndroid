@@ -8,8 +8,10 @@
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/event_list"
-              android:layout_width="wrap_content"
+              android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:divider="@color/colorWhite"
+              android:dividerHeight="2dp"
               android:background="@color/colorBlack"
               tools:context="com.amayzingapps.outhouseticketscannerandroid.EventListActivity"
               tools:listitem="@layout/event_list_content"/>

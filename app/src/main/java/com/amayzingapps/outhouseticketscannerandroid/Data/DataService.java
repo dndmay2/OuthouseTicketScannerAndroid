@@ -44,7 +44,7 @@ public class DataService extends ViewModel {
     public final ObservableField<String> TICKET_CODE = new ObservableField<>();
     public static String TICKET_STATUS = "None";
     public static String TICKET_STATUS_MESSAGE = "";
-    public static final ArrayList<UpcomingEvent> UPCOMING_EVENTS_FOR_VENUE = new ArrayList<>();
+    public static ArrayList<UpcomingEvent> UPCOMING_EVENTS_FOR_VENUE = new ArrayList<>();
     public static final Map<String, String> UPCOMING_EVENTS_WITH_DATE = new HashMap<>();
     public static final Map<String, UpcomingEvent> EVENTS_MAP = new HashMap<>();
 
@@ -131,6 +131,7 @@ public class DataService extends ViewModel {
         private SoapObject soapObject;
         private SoapObject soapObjectResult;
         private SoapPrimitive soapPrimitiveResult;
+        private boolean ticketResult;
         private Vector<SoapPrimitive> soapVectorPrimitiveResult;
         private String currentCommand;
         private ArrayList<String> properties = new ArrayList<>();
@@ -148,28 +149,45 @@ public class DataService extends ViewModel {
                     ScannedTicketCountLive.setValue(NUM_SCANNED_TICKETS);
                     break;
                 case "ProcessTicketCode":
-                    String result = this.soapVectorPrimitiveResult.get(0).toString();
-                    String message = this.soapVectorPrimitiveResult.get(1).toString();
-                    Log.d("OHDataService", "testing processTicketCode " + result + " " + message);
-                    TicketMessageLive.postValue(message);
+                    if (this.ticketResult) {
+                        String result = this.soapPrimitiveResult.toString();
+                        String message = "Ticket scanned successfully";
+                        Log.d("OHDataService", "testing processTicketCode " + result + " " + message);
+                        TICKET_STATUS = result;
+                        TicketMessageLive.postValue(message);
+                    }
+                    else {
+                        String result = this.soapVectorPrimitiveResult.get(0).toString();
+                        String message = this.soapVectorPrimitiveResult.get(1).toString();
+                        Log.d("OHDataService", "testing processTicketCode " + result + " " + message);
+                        TICKET_STATUS = result;
+                        TicketMessageLive.postValue(message);
+                    }
                     break;
                 case "GetUpcommingEvents_Custom":
                 case "GetUpcommingEvents":
+                    UPCOMING_EVENTS_FOR_VENUE = new ArrayList<>();
                     // We have a hierarchical soap object
                     for(int i = 0; i < this.properties.size(); i+=2) {
                         String [] eventIdList = this.properties.get(i).split("::");
                         String [] eventNameList = this.properties.get(i+1).split("::");
                         String eventId = eventIdList[1];
                         String eventName = eventNameList[1];
-                        String [] eventNamePartsList = eventName.split(" - ");
-                        String eventDate;
                         if(this.currentCommand.equals("GetUpcommingEvents_Custom")) {
+//                            if (eventName.equals("Bar Code Test")) {
+//                                eventName = "This is a very long event name that should ";
+//                            }
+//                            if (eventName.equals("Bar Code Test 2")) {
+//                                eventName = "This is a very long event name that should span more than one line ";
+//                            }
                             UpcomingEvent event = new UpcomingEvent(eventId, eventName, UPCOMING_EVENTS_WITH_DATE.get(eventId));
                             UPCOMING_EVENTS_FOR_VENUE.add(event);
                             EVENTS_MAP.put(eventId, event);
                             Log.d("OHDataService", "prop:" + event.eventId + "," + event.eventName + "," + event.eventDate);
                         }
                         else {
+                            String [] eventNamePartsList = eventName.split(" - ");
+                            String eventDate;
                             if (eventNamePartsList.length >= 2) {
                                 eventDate = eventNamePartsList[eventNamePartsList.length - 1];
                                 UPCOMING_EVENTS_WITH_DATE.put(eventId, eventDate);
@@ -234,15 +252,27 @@ public class DataService extends ViewModel {
                     case "GetUpcommingEvents":
                     case "GetUpcommingEvents_Custom":
                     case "GetTicketDBForEvent": {
+                        // "org.ksoap2.serialization.SoapObject"
                         this.soapObjectResult = (SoapObject)envelope.getResponse();
                         ScanSoapObject(this.soapObjectResult);
                         break;
                     }
                     case "ProcessTicketCode": {
-                        this.soapVectorPrimitiveResult = (Vector<SoapPrimitive>) envelope.getResponse();
+                        // When it fails there are two return values - false, msg
+                        if(envelope.getResponse().getClass().getName().equals("java.util.Vector")) {
+                            this.soapVectorPrimitiveResult = (Vector<SoapPrimitive>) envelope.getResponse();
+                            this.ticketResult = false;
+                        }
+                        // When it is true, it simply returns true
+                        else {
+                            // "org.ksoap2.serialization.SoapPrimitive"
+                            this.soapPrimitiveResult = (SoapPrimitive) envelope.getResponse();
+                            this.ticketResult = true;
+                        }
                         break;
                     }
                     default: {
+                        // "org.ksoap2.serialization.SoapPrimitive"
                         this.soapPrimitiveResult = (SoapPrimitive) envelope.getResponse();
                         break;
                     }

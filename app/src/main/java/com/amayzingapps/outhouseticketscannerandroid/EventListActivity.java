@@ -4,15 +4,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -36,6 +35,10 @@ public class EventListActivity extends AppCompatActivity  {
      */
 
     private ListView eventListView;
+    private String venueId;
+    private Boolean soundEffects;
+    private SharedPreferences sharedPref;
+    private DataService model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +48,20 @@ public class EventListActivity extends AppCompatActivity  {
 
         final Context context = this;
 
-//        DataService md = new DataService();
-//        ActivityEvenListBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_event_list);
-//        binding.setDataService(md);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        venueId = sharedPref.getString("venueId", "");
+        soundEffects = sharedPref.getBoolean("soundEffects", false);
 
-        eventListView = findViewById(R.id.event_list);
+        Log.d("OHEventListActivity", "venueId = " + venueId);
 
-        final DataService model = ViewModelProviders.of(this).get(DataService.class);
+        eventListView = (ListView) findViewById(R.id.event_list);
+        model = ViewModelProviders.of(this).get(DataService.class);
         model.getUpcomingEventsWithDate_live();
         model.getUpcomingEventsWithDateLive().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String data) {
                 Log.d("OHEventListActivity", "upcoming events: " + data);
-                model.getUpcomingEventsForVenue_live(DataService.TEST_VENUE_ID);
+                model.getUpcomingEventsForVenue_live(venueId);
             }
         });
 
@@ -65,10 +69,9 @@ public class EventListActivity extends AppCompatActivity  {
             @Override
             public void onChanged(@Nullable String data) {
                 Log.d("OHEventListActivity", "venue events: " + data);
-                setupListView(eventListView);
+                setupListViewWithEvents(eventListView);
             }
         });
-
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -78,30 +81,34 @@ public class EventListActivity extends AppCompatActivity  {
                 detailIntent.putExtra("id", event.eventId);
                 detailIntent.putExtra("name", event.eventName);
                 detailIntent.putExtra("date", event.eventDate);
+                detailIntent.putExtra("venue", venueId);
+                detailIntent.putExtra("soundEffects", soundEffects);
 
                 startActivity(detailIntent);
             }
         });
     }
 
-//    public void onResultsSucceeded(String result) {
-//        Log.d("OHonResultsSucceeded", "I made it " + result);
-//        Log.d("OHDataService", "I made it to the listener on activity");
-//        eventListView = findViewById(R.id.event_list);
-//        setupListView(eventListView);
-//
-//    }
-
-    private void setupListView(@NonNull ListView eventListView) {
-//        ArrayList<UpcomingEvent> mValues = new ArrayList<>();
-//        mValues.add(new UpcomingEvent("1", "my event name", "1/2/3"));
-//        EventListViewAdapter adapter = new EventListViewAdapter(this, mValues);
+    private void setupListViewWithEvents(@NonNull ListView eventListView) {
         EventListViewAdapter adapter = new EventListViewAdapter(this, DataService.UPCOMING_EVENTS_FOR_VENUE);
         eventListView.setAdapter(adapter);
-//        eventListView.setBackgroundColor(Color.BLACK);
         Log.d("OHsetupListView", "Done");
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        String currentVenueId = sharedPref.getString("venueId", "");
+        Log.d("OHEventListActivity", "currentVenueId=" + currentVenueId + "  venueId="+venueId);
+        if(!venueId.equals(currentVenueId)) {
+            venueId = currentVenueId;
+            model.getUpcomingEventsWithDate_live();
+        }
+        Boolean currentSoundEffects = sharedPref.getBoolean("soundEffects", false);
+        if(!soundEffects.equals(currentSoundEffects)) {
+            soundEffects = currentSoundEffects;
+        }
+    }
 
     public class EventListViewAdapter extends BaseAdapter {
         private final ArrayList<UpcomingEvent> mValues;
@@ -161,33 +168,29 @@ public class EventListActivity extends AppCompatActivity  {
         }
 
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_event_list, menu);
+        return true;
+    }
 
-//    public void getUpcomingEventsForVenue(String venueId){
-//        String cmd = "GetUpcommingEvents_Custom";
-//        DataService.CallWebService task = new DataService.CallWebService();
-//        /*
-//         * Set this Activity as the listener
-//         * on the AsyncTask. The AsyncTask will now
-//         * have a reference to this Activity and will
-//         * call onResultsSucceeded() in its
-//         * onPostExecute method.
-//         */
-//        task.setOnResultsListener(this);
-//        task.execute(cmd, venueId);
-//    }
-//
-//    public void getUpcomingEventsWithDate(){
-//        String cmd = "GetUpcommingEvents";
-//        DataService.CallWebService task = new DataService.CallWebService();
-//        /*
-//         * Set this Activity as the listener
-//         * on the AsyncTask. The AsyncTask will now
-//         * have a reference to this Activity and will
-//         * call onResultsSucceeded() in its
-//         * onPostExecute method.
-//         */
-//        task.setOnResultsListener(this);
-//        task.execute(cmd);
-//    }
+    /**
+     * react to the user tapping/selecting an options menu item
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.settings:
+                //Toast.makeText(this, "ADD!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, MyPreferenceActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
 
 }
