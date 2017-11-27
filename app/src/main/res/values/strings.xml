@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">Outhouse</string>
     <string name="title_event_list">Upcoming Events</string>
-    <string name="title_event_detail">Ticket Details</string>
-    <string name="title_activity_ticket">Ticket Details</string>
-    <string name="totalTickets">Total Tickets:</string>
-    <string name="title_activity_scan">ScanActivity</string>
     <string name="action_settings">Settings</string>
 </resources>

@@ -1,6 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.amayzingapps.outhouseticketscannerandroid.EventDetailsActivity" >
     <item android:id="@+id/info"
+          app:showAsAction="ifRoom"
+          android:icon="@drawable/bar_code_red_menu"
           android:title="Info" />
 </menu>

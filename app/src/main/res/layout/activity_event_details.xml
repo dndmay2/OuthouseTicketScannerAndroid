@@ -36,7 +36,8 @@
             app:layout_constraintRight_toRightOf="parent"
             tools:layout_constraintLeft_creator="1"
             android:layout_marginBottom="28dp"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:background="@drawable/button_background_selector"/>
 
     <TextView
             android:layout_width="wrap_content"
@@ -72,6 +73,7 @@
             android:textColor="@color/colorBlack"
             android:textSize="14sp"
             android:textAlignment="textEnd"
+            android:gravity="end"
             android:text="0"
             tools:layout_constraintRight_creator="1"
             tools:layout_constraintBottom_creator="1"
@@ -89,6 +91,7 @@
             android:textColor="@color/colorBlack"
             android:textSize="14sp"
             android:textAlignment="textEnd"
+            android:gravity="end"
             android:text="0"
             app:layout_constraintRight_toRightOf="@+id/ticketsScanned"
             tools:layout_constraintBottom_creator="1"
@@ -110,6 +113,7 @@
             android:layout_marginTop="10dp"
             tools:layout_constraintLeft_creator="1"
             android:layout_marginBottom="10dp"
+            android:contentDescription="stop sign for failed ticket scan"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/checkMarkImg"/>
 
@@ -128,6 +132,7 @@
             android:layout_marginTop="41dp"
             tools:layout_constraintLeft_creator="1"
             android:layout_marginBottom="32dp"
+            android:contentDescription="check mark for successful ticket scan"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 

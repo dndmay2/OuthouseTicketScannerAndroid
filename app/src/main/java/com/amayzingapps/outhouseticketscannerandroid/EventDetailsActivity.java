@@ -42,7 +42,6 @@ public class EventDetailsActivity extends AppCompatActivity {
         Log.d("OHEventDetailsActivity", "soundEffects = " + soundEffects);
 
         setupTitleBar();
-//        playSound(R.raw.nasty_error_long);
 
         TextView eventNameText = (TextView) findViewById(R.id.eventName);
         eventNameText.setText(eventName);
@@ -65,6 +64,26 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         model.getTicketCodeLive().observe(this, setupObserver(R.id.msgText));
 
+        model.getTicketMessageLive().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                switch (model.TICKET_STATUS) {
+                    case "true":
+                        setImgDisplay("valid", s);
+                        model.getScannedTicketCountForEvent_Live(eventId);
+                        break;
+                    case "false":
+                        setImgDisplay("invalid", s);
+                        break;
+                    default:
+                        setImgDisplay("cancelled", s);
+                        break;
+                }
+                // Update total ticket count between each scan in case more
+                // tickets are purchased
+                model.getTicketCountForEvent_Live(eventId);
+            }
+        });
     }
 
     private Observer<String> setupObserver(final int idName) {
@@ -100,26 +119,10 @@ public class EventDetailsActivity extends AppCompatActivity {
         Log.d("OHEventDetailsActivity", "eventId = " + eventId + " codeNumber = " + codeNumber);
         final DataService model = ViewModelProviders.of(this).get(DataService.class);
         model.processTicketCode_Live(eventId, codeNumber);
-//        model.getTicketMessageLive().observe(this, setupObserver(R.id.ticketMessage));
-        model.getTicketMessageLive().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                switch (model.TICKET_STATUS) {
-                    case "true":
-                        setImgDisplay("valid", s);
-                        break;
-                    case "false":
-                        setImgDisplay("invalid", s);
-                        break;
-                    default:
-                        setImgDisplay("cancelled", s);
-                        break;
-                }
-            }
-        });
     }
 
     private void setImgDisplay(String value, String s) {
+        Log.d("OHEventDetailsActivity", "setImgDisplay - " + value + ":" + s);
         TextView tv = (TextView) findViewById(R.id.ticketMessage);
         TextView code = (TextView) findViewById(R.id.msgText);
         ImageView stopSignImg = (ImageView) findViewById(R.id.stopSignImg);
